@@ -3,172 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quantum Empire | Radar HUD</title>
+    <title>Quantum Empire | Radar</title>
     <style>
-        :root {
-            --neon-green: #00ff41;
-            --dark-void: #0a0a0a;
-            --glass: rgba(255, 255, 255, 0.05);
-            --error-red: #ff3131;
-        }
-
-        body {
-            background-color: var(--dark-void);
-            color: white;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-        }
-
-        h1 {
-            color: var(--neon-green);
-            text-transform: uppercase;
-            letter-spacing: 5px;
-            text-shadow: 0 0 15px var(--neon-green);
-            margin: 40px 0;
-            text-align: center;
-        }
-
-        #status-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 25px;
-            width: 100%;
-            max-width: 1100px;
-            padding: 20px;
-        }
-
-        .card {
-            background: var(--glass);
-            border: 1px solid rgba(0, 255, 65, 0.3);
-            padding: 25px;
-            border-radius: 15px;
-            backdrop-filter: blur(10px);
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .card:hover {
-            transform: translateY(-10px);
-            border-color: var(--neon-green);
-            box-shadow: 0 0 30px rgba(0, 255, 65, 0.2);
-        }
-
-        .name { 
-            font-size: 1.6rem; 
-            font-weight: bold; 
-            margin-bottom: 5px; 
-            color: white;
-        }
-
-        .type { 
-            color: #888; 
-            font-size: 0.8rem; 
-            text-transform: uppercase;
-            margin-bottom: 20px;
-            letter-spacing: 1px;
-        }
-
-        .status { 
-            font-weight: bold; 
-            font-size: 1.1rem;
-            display: inline-block;
-            margin-bottom: 10px;
-        }
-
-        .latency { 
-            color: var(--neon-green); 
-            font-family: 'Courier New', Courier, monospace; 
-            font-size: 0.9rem;
-            background: rgba(0, 255, 65, 0.1);
-            padding: 5px 10px;
-            border-radius: 5px;
-            display: inline-block;
-        }
-        
-        .update-time {
-            margin-top: auto;
-            padding: 40px 0;
-            color: #555;
-            font-size: 0.85rem;
-            letter-spacing: 1px;
-        }
-
-        /* أنيميشن بسيط للنظام */
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.5; }
-            100% { opacity: 1; }
-        }
-
-        .loading-text {
-            animation: pulse 1.5s infinite;
-            color: var(--neon-green);
-        }
+        :root { --neon: #00ff41; --bg: #0a0a0a; }
+        body { background: var(--bg); color: white; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; padding: 20px; }
+        h1 { color: var(--neon); text-shadow: 0 0 10px var(--neon); letter-spacing: 3px; }
+        #status-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; width: 100%; max-width: 1000px; }
+        .card { background: rgba(255,255,255,0.05); border: 1px solid rgba(0,255,65,0.2); padding: 20px; border-radius: 12px; transition: 0.3s; }
+        .card:hover { border-color: var(--neon); transform: translateY(-5px); box-shadow: 0 0 20px rgba(0,255,65,0.1); }
+        .latency { color: var(--neon); font-family: monospace; background: rgba(0,255,65,0.1); padding: 5px 10px; border-radius: 4px; display: inline-block; margin-top: 10px; }
+        .update-time { margin-top: 30px; color: #555; font-size: 0.8rem; }
     </style>
 </head>
 <body>
-
     <h1>QUANTUM EMPIRE RADAR</h1>
-    
-    <div id="status-container">
-        <div class="loading-text">جاري سحب البيانات من القمر الصناعي...</div>
-    </div>
-
-    <div class="update-time" id="last-update">جاري مزامنة الوقت...</div>
+    <div id="status-container">جاري مزامنة الإشارة مع الأقمار الصناعية...</div>
+    <div class="update-time" id="last-update"></div>
 
     <script>
-        async function updateDashboard() {
+        async function refreshRadar() {
             try {
-                // إضافة متغير عشوائي لضمان عدم قراءة نسخة مخزنة (Cache)
-                const cacheBuster = new Date().getTime();
-                const response = await fetch(`./data.json?v=${cacheBuster}`);
+                // منع التخزين المؤقت عبر إضافة رقم عشوائي للرابط
+                const response = await fetch('./data.json?update=' + new Date().getTime());
                 const result = await response.json();
                 
                 const container = document.getElementById('status-container');
                 const updateElem = document.getElementById('last-update');
                 
-                // تحديث وقت النظام
-                updateElem.innerText = `آخر تحديث للنظام: ${result.last_update || 'جاري المزامنة...'}`;
-
+                updateElem.innerText = `آخر مزامنة للنظام: ${result.last_update}`;
                 container.innerHTML = '';
 
-                // استخراج قائمة البيانات سواء كانت في result.data أو result مباشرة
-                const targets = result.data || (Array.isArray(result) ? result : []);
-
-                if (targets.length > 0) {
-                    targets.forEach(target => {
-                        const card = document.createElement('div');
-                        card.className = 'card';
-                        
-                        // تحديد القيمة: إذا لم تكن موجودة نعرض "Pending..." بدلاً من Calculating
-                        const displayLatency = target.latency && target.latency !== "N/A" 
-                                               ? target.latency 
-                                               : "جاري الحساب...";
-
-                        card.innerHTML = `
-                            <div class="name">${target.name}</div>
-                            <div class="type">${target.type || 'SYSTEM TARGET'}</div>
-                            <div class="status" style="color: #00ff41">${target.status}</div>
-                            <br>
-                            <div class="latency">الاستجابة: ${displayLatency}</div>
-                        `;
-                        container.appendChild(card);
-                    });
-                } else {
-                    container.innerHTML = '<div class="loading-text">قاعدة البيانات تنتظر أول دورة حصاد...</div>';
-                }
-            } catch (error) {
-                console.error("Data Fetch Error:", error);
+                result.data.forEach(item => {
+                    const card = document.createElement('div');
+                    card.className = 'card';
+                    card.innerHTML = `
+                        <div style="font-size: 1.4rem; font-weight: bold;">${item.name}</div>
+                        <div style="font-size: 0.7rem; color: #888;">${item.type}</div>
+                        <div style="margin: 15px 0; color: ${item.status.includes('✅') ? '#00ff41' : '#ff3131'}">${item.status}</div>
+                        <div class="latency">الاستجابة: ${item.latency}</div>
+                    `;
+                    container.appendChild(card);
+                });
+            } catch (err) {
+                console.error("خطأ في الاتصال:", err);
             }
         }
-
-        updateDashboard();
-        // تحديث تلقائي كل 30 ثانية
-        setInterval(updateDashboard, 30000);
+        refreshRadar();
+        setInterval(refreshRadar, 60000); // تحديث الواجهة كل دقيقة
     </script>
+</body>
+</html>
