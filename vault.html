@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quantum Vault | Secret Operations</title>
+    <style>
+        :root { --gold: #ffcc00; --bg: #050505; }
+        body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; padding: 30px; }
+        .header { border-bottom: 2px solid var(--gold); padding-bottom: 10px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; }
+        .project-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        .secret-card { background: #111; border: 1px dashed var(--gold); padding: 20px; border-radius: 12px; transition: 0.3s; }
+        .secret-card:hover { background: #1a1a1a; transform: scale(1.02); }
+        .tag { background: var(--gold); color: black; padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; text-transform: uppercase; }
+        .back-btn { color: var(--gold); text-decoration: none; font-size: 0.9rem; border: 1px solid var(--gold); padding: 8px 20px; border-radius: 5px; transition: 0.3s; }
+        .back-btn:hover { background: var(--gold); color: black; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1 style="color: var(--gold); margin: 0;">🔱 مركز العمليات السري</h1>
+        <a href="index.html" class="back-btn">العودة للرادار</a>
+    </div>
+
+    <div class="project-grid">
+        <!-- نظام المبيعات -->
+        <div class="secret-card">
+            <span class="tag">قيد التطوير</span>
+            <h3>📦 برنامج المبيعات الشامل</h3>
+            <p style="color: #888;">نظام إحصائي لإدارة المخازن والفواتير (Core System).</p>
+        </div>
+
+        <!-- منصة الاستشارات -->
+        <div class="secret-card">
+            <span class="tag">Active</span>
+            <h3>🌐 Global Digital Consulting</h3>
+            <p style="color: #888;">المنصة الاستشارية مع لوحة التحكم المخفية المدمجة.</p>
+        </div>
+
+        <!-- الأتمتة -->
+        <div class="secret-card">
+            <span class="tag">Automation</span>
+            <h3>🤖 Quantum Ecosystem</h3>
+            <p style="color: #888;">نظام الأتمتة المزدوج المعتمد على Python و GitHub Actions.</p>
+        </div>
+    </div>
+
+    <div style="margin-top: 60px; text-align: center; color: #444; border-top: 1px solid #222; padding-top: 20px;">
+        <p>وصول مصرح به فقط للمستخدم: Eissa</p>
+    </div>
+</body>
+</html>
