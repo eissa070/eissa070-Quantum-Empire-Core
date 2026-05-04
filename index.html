@@ -9,6 +9,7 @@
             --neon-green: #00ff41;
             --dark-void: #0a0a0a;
             --glass: rgba(255, 255, 255, 0.05);
+            --error-red: #ff3131;
         }
 
         body {
@@ -20,85 +21,156 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            min-height: 100vh;
         }
 
         h1 {
             color: var(--neon-green);
             text-transform: uppercase;
             letter-spacing: 5px;
-            text-shadow: 0 0 10px var(--neon-green);
-            margin-bottom: 30px;
+            text-shadow: 0 0 15px var(--neon-green);
+            margin: 40px 0;
+            text-align: center;
         }
 
         #status-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
             width: 100%;
-            max-width: 1200px;
+            max-width: 1100px;
+            padding: 20px;
         }
 
         .card {
             background: var(--glass);
-            border: 1px solid var(--neon-green);
-            padding: 20px;
+            border: 1px solid rgba(0, 255, 65, 0.3);
+            padding: 25px;
             border-radius: 15px;
             backdrop-filter: blur(10px);
-            transition: transform 0.3s ease;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
         }
 
         .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 0 20px rgba(0, 255, 65, 0.2);
+            transform: translateY(-10px);
+            border-color: var(--neon-green);
+            box-shadow: 0 0 30px rgba(0, 255, 65, 0.2);
         }
 
-        .name { font-size: 1.5rem; font-weight: bold; margin-bottom: 10px; }
-        .type { color: #aaa; font-size: 0.9rem; margin-bottom: 15px; }
-        .status { font-weight: bold; padding: 5px 10px; border-radius: 5px; }
-        .latency { color: var(--neon-green); font-family: monospace; margin-top: 15px; }
+        .name { 
+            font-size: 1.6rem; 
+            font-weight: bold; 
+            margin-bottom: 5px; 
+            color: white;
+        }
+
+        .type { 
+            color: #888; 
+            font-size: 0.8rem; 
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            letter-spacing: 1px;
+        }
+
+        .status { 
+            font-weight: bold; 
+            font-size: 1.1rem;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+
+        .latency { 
+            color: var(--neon-green); 
+            font-family: 'Courier New', Courier, monospace; 
+            font-size: 0.9rem;
+            background: rgba(0, 255, 65, 0.1);
+            padding: 5px 10px;
+            border-radius: 5px;
+            display: inline-block;
+        }
         
         .update-time {
-            margin-top: 40px;
-            color: #666;
-            font-size: 0.8rem;
+            margin-top: auto;
+            padding: 40px 0;
+            color: #555;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+        }
+
+        /* أنيميشن بسيط للنظام */
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .loading-text {
+            animation: pulse 1.5s infinite;
+            color: var(--neon-green);
         }
     </style>
 </head>
 <body>
 
-    <h1>Quantum Empire Radar</h1>
-    <div id="status-container">جاري سحب البيانات من القمر الصناعي...</div>
-    <div class="update-time" id="last-update"></div>
+    <h1>QUANTUM EMPIRE RADAR</h1>
+    
+    <div id="status-container">
+        <div class="loading-text">جاري سحب البيانات من القمر الصناعي...</div>
+    </div>
+
+    <div class="update-time" id="last-update">جاري مزامنة الوقت...</div>
 
     <script>
         async function updateDashboard() {
             try {
-                const response = await fetch('./data.json');
+                // استخدام Timestamp لمنع تخزين النسخة القديمة (Cache)
+                const response = await fetch('./data.json?v=' + new Date().getTime());
                 const result = await response.json();
                 
                 const container = document.getElementById('status-container');
                 const updateElem = document.getElementById('last-update');
                 
-                updateElem.innerText = `آخر تحديث للنظام: ${result.last_update}`;
+                // تحديث وقت النظام
+                if (result.last_update) {
+                    updateElem.innerText = `آخر تحديث للنظام: ${result.last_update}`;
+                } else if (result[0] && result[0].last_check) {
+                    updateElem.innerText = `آخر تحديث للنظام: ${result[0].last_check}`;
+                }
+
                 container.innerHTML = '';
 
-                result.data.forEach(target => {
-                    const card = document.createElement('div');
-                    card.className = 'card';
-                    card.innerHTML = `
-                        <div class="name">${target.name}</div>
-                        <div class="type">${target.type}</div>
-                        <div class="status">${target.status}</div>
-                        <div class="latency">الاستجابة: ${target.latency || 'N/A'}</div>
-                    `;
-                    container.appendChild(card);
-                });
+                // فحص هيكل البيانات (دعم النسخة القديمة والجديدة)
+                const targets = Array.isArray(result) ? result : result.data;
+
+                if (targets && targets.length > 0) {
+                    targets.forEach(target => {
+                        const card = document.createElement('div');
+                        card.className = 'card';
+                        
+                        // اختيار اللون بناء على الحالة
+                        const statusColor = target.status.includes('Online') || target.status.includes('✅') ? 'var(--neon-green)' : 'var(--error-red)';
+                        
+                        card.innerHTML = `
+                            <div class="name">${target.name}</div>
+                            <div class="type">${target.type || 'System Target'}</div>
+                            <div class="status" style="color: ${statusColor}">${target.status}</div>
+                            <br>
+                            <div class="latency">الاستجابة: ${target.latency || 'Calculating...'}</div>
+                        `;
+                        container.appendChild(card);
+                    });
+                } else {
+                    container.innerHTML = '<div class="loading-text">قاعدة البيانات فارغة.. بانتظار دورة الحصاد القادمة.</div>';
+                }
             } catch (error) {
-                console.error("خطأ في جلب البيانات:", error);
+                console.error("Critical Error:", error);
+                document.getElementById('status-container').innerHTML = `<div style="color:var(--error-red)">فشل الاتصال بالرادار.. تأكد من تشغيل الـ Action بنجاح.</div>`;
             }
         }
 
-        // تحديث البيانات كل دقيقة
+        // تشغيل التحديث فوراً وكل دقيقة
         updateDashboard();
         setInterval(updateDashboard, 60000);
     </script>
