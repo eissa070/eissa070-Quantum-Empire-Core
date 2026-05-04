@@ -35,3 +35,12 @@ jobs:
           git add data.json
           git commit -m "Automated Data Update [skip ci]" || echo "No changes to commit"
           git push
+          - name: Commit and Push Changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          # سحب التحديثات أولاً لتجنب الـ Rejected Push
+          git pull origin main --rebase
+          git add data.json
+          # التأكد من وجود تغييرات قبل الـ Commit
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Automated Data Update [skip ci]" && git push origin main)
