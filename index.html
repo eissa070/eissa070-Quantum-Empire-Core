@@ -125,54 +125,50 @@
     <script>
         async function updateDashboard() {
             try {
-                // استخدام Timestamp لمنع تخزين النسخة القديمة (Cache)
-                const response = await fetch('./data.json?v=' + new Date().getTime());
+                // إضافة متغير عشوائي لضمان عدم قراءة نسخة مخزنة (Cache)
+                const cacheBuster = new Date().getTime();
+                const response = await fetch(`./data.json?v=${cacheBuster}`);
                 const result = await response.json();
                 
                 const container = document.getElementById('status-container');
                 const updateElem = document.getElementById('last-update');
                 
                 // تحديث وقت النظام
-                if (result.last_update) {
-                    updateElem.innerText = `آخر تحديث للنظام: ${result.last_update}`;
-                } else if (result[0] && result[0].last_check) {
-                    updateElem.innerText = `آخر تحديث للنظام: ${result[0].last_check}`;
-                }
+                updateElem.innerText = `آخر تحديث للنظام: ${result.last_update || 'جاري المزامنة...'}`;
 
                 container.innerHTML = '';
 
-                // فحص هيكل البيانات (دعم النسخة القديمة والجديدة)
-                const targets = Array.isArray(result) ? result : result.data;
+                // استخراج قائمة البيانات سواء كانت في result.data أو result مباشرة
+                const targets = result.data || (Array.isArray(result) ? result : []);
 
-                if (targets && targets.length > 0) {
+                if (targets.length > 0) {
                     targets.forEach(target => {
                         const card = document.createElement('div');
                         card.className = 'card';
                         
-                        // اختيار اللون بناء على الحالة
-                        const statusColor = target.status.includes('Online') || target.status.includes('✅') ? 'var(--neon-green)' : 'var(--error-red)';
-                        
+                        // تحديد القيمة: إذا لم تكن موجودة نعرض "Pending..." بدلاً من Calculating
+                        const displayLatency = target.latency && target.latency !== "N/A" 
+                                               ? target.latency 
+                                               : "جاري الحساب...";
+
                         card.innerHTML = `
                             <div class="name">${target.name}</div>
-                            <div class="type">${target.type || 'System Target'}</div>
-                            <div class="status" style="color: ${statusColor}">${target.status}</div>
+                            <div class="type">${target.type || 'SYSTEM TARGET'}</div>
+                            <div class="status" style="color: #00ff41">${target.status}</div>
                             <br>
-                            <div class="latency">الاستجابة: ${target.latency || 'Calculating...'}</div>
+                            <div class="latency">الاستجابة: ${displayLatency}</div>
                         `;
                         container.appendChild(card);
                     });
                 } else {
-                    container.innerHTML = '<div class="loading-text">قاعدة البيانات فارغة.. بانتظار دورة الحصاد القادمة.</div>';
+                    container.innerHTML = '<div class="loading-text">قاعدة البيانات تنتظر أول دورة حصاد...</div>';
                 }
             } catch (error) {
-                console.error("Critical Error:", error);
-                document.getElementById('status-container').innerHTML = `<div style="color:var(--error-red)">فشل الاتصال بالرادار.. تأكد من تشغيل الـ Action بنجاح.</div>`;
+                console.error("Data Fetch Error:", error);
             }
         }
 
-        // تشغيل التحديث فوراً وكل دقيقة
         updateDashboard();
-        setInterval(updateDashboard, 60000);
+        // تحديث تلقائي كل 30 ثانية
+        setInterval(updateDashboard, 30000);
     </script>
-</body>
-</html>
