@@ -3,50 +3,101 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quantum Vault | Secret Operations</title>
+    <title>Quantum Vault | Financial & Ops Center</title>
     <style>
-        :root { --gold: #ffcc00; --bg: #050505; }
-        body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; padding: 30px; }
-        .header { border-bottom: 2px solid var(--gold); padding-bottom: 10px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; }
-        .project-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
-        .secret-card { background: #111; border: 1px dashed var(--gold); padding: 20px; border-radius: 12px; transition: 0.3s; }
-        .secret-card:hover { background: #1a1a1a; transform: scale(1.02); }
-        .tag { background: var(--gold); color: black; padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; text-transform: uppercase; }
-        .back-btn { color: var(--gold); text-decoration: none; font-size: 0.9rem; border: 1px solid var(--gold); padding: 8px 20px; border-radius: 5px; transition: 0.3s; }
-        .back-btn:hover { background: var(--gold); color: black; }
+        :root { --gold: #ffcc00; --bg: #050505; --neon: #00ff41; }
+        body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; padding: 20px; margin: 0; }
+        
+        /* الهيدر */
+        .header { border-bottom: 2px solid var(--gold); padding: 15px; display: flex; justify-content: space-between; align-items: center; background: rgba(255,204,0,0.05); }
+        
+        /* شريط الكريبتو الحي */
+        .crypto-ticker { background: #111; padding: 10px; display: flex; gap: 20px; overflow-x: auto; border-bottom: 1px solid #222; font-family: monospace; }
+        .coin { display: flex; gap: 8px; align-items: center; white-space: nowrap; }
+        .up { color: var(--neon); }
+
+        /* شبكة المشاريع والمال */
+        .main-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; padding: 20px; }
+        .card { background: #0f0f0f; border: 1px solid #222; padding: 20px; border-radius: 12px; position: relative; overflow: hidden; }
+        .card:hover { border-color: var(--gold); }
+        .card::before { content: ''; position: absolute; top: 0; right: 0; width: 5px; height: 100%; background: var(--gold); opacity: 0.3; }
+
+        .balance { font-size: 2rem; font-weight: bold; color: var(--gold); margin: 10px 0; }
+        .tag { background: #222; color: var(--gold); padding: 3px 10px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; }
+        
+        .btn-action { background: transparent; border: 1px solid var(--gold); color: var(--gold); padding: 8px; border-radius: 5px; cursor: pointer; width: 100%; margin-top: 10px; transition: 0.3s; }
+        .btn-action:hover { background: var(--gold); color: black; }
     </style>
 </head>
 <body>
+
+    <!-- شريط أسعار الكريبتو الحي -->
+    <div class="crypto-ticker" id="crypto-ticker">
+        <div class="coin">BTC: <span id="btc-price">Loading...</span></div>
+        <div class="coin">ETH: <span id="eth-price">Loading...</span></div>
+        <div class="coin">USDT: <span class="up">1.00$</span></div>
+        <div class="coin">BNB: <span id="bnb-price">Loading...</span></div>
+    </div>
+
     <div class="header">
-        <h1 style="color: var(--gold); margin: 0;">🔱 مركز العمليات السري</h1>
-        <a href="index.html" class="back-btn">العودة للرادار</a>
+        <h1 style="color: var(--gold); margin: 0; font-size: 1.5rem;">🔱 مركز العمليات والتمويل</h1>
+        <div style="display: flex; gap: 10px;">
+            <span id="user-status" style="color: var(--neon); font-size: 0.8rem;">● Admin: Eissa</span>
+            <a href="index.html" style="color: var(--gold); text-decoration: none; border: 1px solid var(--gold); padding: 5px 15px; border-radius: 5px;">خروج</a>
+        </div>
     </div>
 
-    <div class="project-grid">
-        <!-- نظام المبيعات -->
-        <div class="secret-card">
-            <span class="tag">قيد التطوير</span>
+    <div class="main-grid">
+        <!-- كارت الأرباح المجانية والكريديت -->
+        <div class="card">
+            <span class="tag">FINANCIAL FUEL</span>
+            <h3>الرصيد والكريديت المجاني</h3>
+            <div class="balance" id="total-credits">150.00$</div>
+            <p style="color: #666; font-size: 0.8rem;">رصيد مجمع من GitHub Pack & Google Cloud</p>
+            <button class="btn-action" onclick="alert('جاري فحص أرصدة المنصات...')">تحديث الأرصدة</button>
+        </div>
+
+        <!-- كارت برنامج المبيعات الشامل -->
+        <div class="card">
+            <span class="tag">ACTIVE PROJECT</span>
             <h3>📦 برنامج المبيعات الشامل</h3>
-            <p style="color: #888;">نظام إحصائي لإدارة المخازن والفواتير (Core System).</p>
+            <div style="margin: 15px 0;">
+                <div style="display: flex; justify-content: space-between;"><span>مبيعات اليوم:</span> <span class="up">+450$</span></div>
+                <div style="display: flex; justify-content: space-between;"><span>المخزون:</span> <span>مستقر ✅</span></div>
+            </div>
+            <button class="btn-action">فتح لوحة التحكم</button>
         </div>
 
-        <!-- منصة الاستشارات -->
-        <div class="secret-card">
-            <span class="tag">Active</span>
-            <h3>🌐 Global Digital Consulting</h3>
-            <p style="color: #888;">المنصة الاستشارية مع لوحة التحكم المخفية المدمجة.</p>
-        </div>
-
-        <!-- الأتمتة -->
-        <div class="secret-card">
-            <span class="tag">Automation</span>
-            <h3>🤖 Quantum Ecosystem</h3>
-            <p style="color: #888;">نظام الأتمتة المزدوج المعتمد على Python و GitHub Actions.</p>
+        <!-- كارت الكريبتو وAirdrops -->
+        <div class="card">
+            <span class="tag">CRYPTO OPS</span>
+            <h3>محفظة العملات الرقمية</h3>
+            <div style="font-family: monospace; font-size: 0.8rem; background: #000; padding: 10px; border-radius: 5px; margin: 10px 0;">
+                Wallet: 0x71C...Eissa070
+            </div>
+            <p style="color: #888;">مراقبة Testnets وAirdrops النشطة.</p>
+            <button class="btn-action">سحب الأرباح</button>
         </div>
     </div>
 
-    <div style="margin-top: 60px; text-align: center; color: #444; border-top: 1px solid #222; padding-top: 20px;">
-        <p>وصول مصرح به فقط للمستخدم: Eissa</p>
-    </div>
+    <script>
+        // جلب أسعار الكريبتو الحقيقية من API مجاني
+        async function getPrices() {
+            try {
+                const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,binancecoin&vs_currencies=usd');
+                const data = await res.json();
+                
+                document.getElementById('btc-price').innerText = data.bitcoin.usd.toLocaleString() + '$';
+                document.getElementById('eth-price').innerText = data.ethereum.usd.toLocaleString() + '$';
+                document.getElementById('bnb-price').innerText = data.binancecoin.usd.toLocaleString() + '$';
+            } catch (err) {
+                console.log("Price Update Failed");
+            }
+        }
+
+        // تحديث كل 30 ثانية
+        getPrices();
+        setInterval(getPrices, 30000);
+    </script>
 </body>
 </html>
