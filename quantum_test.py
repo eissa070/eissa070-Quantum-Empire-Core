@@ -1,50 +1,39 @@
-import os
 import requests
 import json
 from datetime import datetime
 
-# إعدادات الاتصال من خزنة GitHub
-DISCORD_WEBHOOK = os.getenv('DISCORD_WEBHOOK')
+# قائمة المواقع التي تريد مراقبتها
+targets = [
+    {"name": "Google", "url": "https://www.google.com"},
+    {"name": "GitHub", "url": "https://github.com"},
+    # أضف روابطك الخاصة هنا
+]
 
-# أركان الإمبراطورية (روابطك الحقيقية اللي كانت في كودك القديم)
-SITES_TO_MONITOR = {
-    "Portfolio & Core": "https://eissa01.netlify.app",
-    "Netlify Team Console": "https://app.netlify.com/teams/eissa-s-0mlxtba/projects",
-    "GitHub Core Repo": "https://github.com/eissa070/Quantum-Empire-Core"
-}
-
-def harvest_data():
-    print(f"--- {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | Starting Empire Harvest ---")
+def check_empire():
     results = []
+    print(f"[{datetime.now()}] Starting Empire Radar scan...")
     
-    # فحص المواقع وتجهيز بيانات الجدول
-    for name, url in SITES_TO_MONITOR.items():
+    for target in targets:
         try:
-            res = requests.get(url, timeout=15)
-            status = "Active ✅" if res.status_code == 200 else f"Error {res.status_code} ⚠️"
-        except:
+            # timeout=10 يمنع الكود من التعليق لو الموقع لم يرد
+            response = requests.get(target["url"], timeout=10)
+            status = "Online ✅" if response.status_code == 200 else f"Issue ⚠️ ({response.status_code})"
+        except Exception as e:
             status = "Offline ❌"
         
         results.append({
-            "node_name": name,
+            "name": target["name"],
+            "url": target["url"],
             "status": status,
-            "timestamp": datetime.now().strftime("%H:%M:%S"),
-            "size": "N/A" # أو أي قيمة تحب تعرضها
+            "last_check": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         })
+        print(f"Checked {target['name']}: {status}")
 
-    # 1. حفظ البيانات في ملف JSON للموقع
-    with open('data.json', 'w') as f:
-        json.dump(results, f, indent=4)
-    print("✅ Data archived to data.json")
-
-    # 2. إرسال التقرير المجمع لديسكورد (بشكل احترافي)
-    if DISCORD_WEBHOOK:
-        report = "🚜 **تقرير حصاد الإمبراطورية الدوري**\n"
-        for r in results:
-            report += f"• {r['node_name']}: {r['status']}\n"
-        
-        requests.post(DISCORD_WEBHOOK, json={"content": report})
-        print("✅ Report sent to Discord")
+    # حفظ النتائج في ملف data.json ليقرأه الموقع
+    with open('data.json', 'w', encoding='utf-8') as f:
+        json.dump(results, f, ensure_ascii=False, indent=4)
+    
+    print("Mission accomplished. Data saved to data.json")
 
 if __name__ == "__main__":
-    harvest_data()
+    check_empire()

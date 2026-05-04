@@ -2,45 +2,32 @@ name: Empire Radar
 
 on:
   schedule:
-    - cron: '*/30 * * * *' # يشتغل كل 30 دقيقة
+    - cron: '*/30 * * * *' # يعمل كل 30 دقيقة
   workflow_dispatch: # يسمح لك بتشغيله يدوياً
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write # مهم جداً عشان يقدر يرفع ملف data.json
+
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
+      - name: Checkout Repository
+        uses: actions/checkout@v2
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v2
         with:
-          python_version: '3.9'
+          python-version: '3.9'
 
-      - name: Install Dependencies
+      - name: Install Dependencies and Run Script
         run: |
           pip install requests
+          python quantum_test.py
 
-      - name: Run Radar Script
-        env:
-          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
-        run: python quantum_test.py
-
-      - name: Commit and Push Changes
+      - name: Commit and Push changes
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add data.json
-          git commit -m "Automated Data Update [skip ci]" || echo "No changes to commit"
-          git push
-          - name: Commit and Push Changes
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          # سحب التحديثات أولاً لتجنب الـ Rejected Push
-          git pull origin main --rebase
-          git add data.json
-          # التأكد من وجود تغييرات قبل الـ Commit
-          git diff --quiet && git diff --staged --quiet || (git commit -m "Automated Data Update [skip ci]" && git push origin main)
+          git commit -m "Update Radar Data [Automated]" || exit 0
+          git pull --rebase origin main
+          git push origin main
