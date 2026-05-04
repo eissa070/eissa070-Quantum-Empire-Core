@@ -3,53 +3,189 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quantum Empire | Radar</title>
+    <title>Quantum Empire | Command Center</title>
     <style>
-        :root { --neon: #00ff41; --bg: #0a0a0a; }
-        body { background: var(--bg); color: white; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; padding: 20px; }
-        h1 { color: var(--neon); text-shadow: 0 0 10px var(--neon); letter-spacing: 3px; }
-        #status-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; width: 100%; max-width: 1000px; }
-        .card { background: rgba(255,255,255,0.05); border: 1px solid rgba(0,255,65,0.2); padding: 20px; border-radius: 12px; transition: 0.3s; }
-        .card:hover { border-color: var(--neon); transform: translateY(-5px); box-shadow: 0 0 20px rgba(0,255,65,0.1); }
-        .latency { color: var(--neon); font-family: monospace; background: rgba(0,255,65,0.1); padding: 5px 10px; border-radius: 4px; display: inline-block; margin-top: 10px; }
-        .update-time { margin-top: 30px; color: #555; font-size: 0.8rem; }
+        :root { 
+            --neon: #00ff41; 
+            --bg: #0a0a0a; 
+            --card-bg: rgba(255, 255, 255, 0.05);
+        }
+        
+        body { 
+            background: var(--bg); 
+            color: white; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            padding: 20px; 
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        h1 { 
+            color: var(--neon); 
+            text-shadow: 0 0 15px var(--neon); 
+            letter-spacing: 5px; 
+            margin-top: 40px;
+            font-size: 2.5rem;
+        }
+
+        #status-container { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+            gap: 25px; 
+            width: 100%; 
+            max-width: 1100px; 
+            margin-top: 40px;
+        }
+
+        .card { 
+            background: var(--card-bg); 
+            border: 1px solid rgba(0, 255, 65, 0.1); 
+            padding: 25px; 
+            border-radius: 15px; 
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+        }
+
+        .card:hover { 
+            border-color: var(--neon); 
+            transform: translateY(-10px); 
+            box-shadow: 0 0 30px rgba(0, 255, 65, 0.15); 
+        }
+
+        .latency { 
+            color: var(--neon); 
+            font-family: 'Courier New', Courier, monospace; 
+            background: rgba(0, 255, 65, 0.1); 
+            padding: 8px 15px; 
+            border-radius: 5px; 
+            display: inline-block; 
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+        .update-time { margin-top: 50px; color: #444; font-size: 0.9rem; letter-spacing: 1px; }
+
+        /* --- نظام الممر السري --- */
+        #vault-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.98);
+            z-index: 9999;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(10px);
+        }
+
+        #vault-input {
+            background: transparent;
+            border: none;
+            border-bottom: 3px solid var(--neon);
+            color: var(--neon);
+            font-size: 2.5rem;
+            text-align: center;
+            outline: none;
+            font-family: monospace;
+            width: 80%;
+            max-width: 500px;
+            margin-top: 20px;
+            letter-spacing: 10px;
+        }
+
+        .vault-hint {
+            color: #555;
+            margin-top: 15px;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+        }
     </style>
 </head>
 <body>
+
+    <!-- واجهة البوابة السرية -->
+    <div id="vault-overlay">
+        <div style="color: var(--neon); font-size: 1.2rem; text-shadow: 0 0 10px var(--neon);">IDENTITY VERIFICATION REQUIRED</div>
+        <input type="password" id="vault-input" autocomplete="off">
+        <div class="vault-hint">System access restricted to Eissa Aly</div>
+    </div>
+
     <h1>QUANTUM EMPIRE RADAR</h1>
-    <div id="status-container">جاري مزامنة الإشارة مع الأقمار الصناعية...</div>
-    <div class="update-time" id="last-update"></div>
+    
+    <div id="status-container">جاري فحص الإشارة ومزامنة البيانات...</div>
+    
+    <div class="update-time" id="last-update">جاري تحديث النظام...</div>
 
     <script>
+        // 1. وظيفة تحديث الرادار (العلني)
         async function refreshRadar() {
             try {
-                // منع التخزين المؤقت عبر إضافة رقم عشوائي للرابط
-                const response = await fetch('./data.json?update=' + new Date().getTime());
+                // منع التخزين المؤقت (Cache) للحصول على أحدث بيانات
+                const response = await fetch('./data.json?v=' + new Date().getTime());
                 const result = await response.json();
                 
                 const container = document.getElementById('status-container');
                 const updateElem = document.getElementById('last-update');
                 
-                updateElem.innerText = `آخر مزامنة للنظام: ${result.last_update}`;
+                updateElem.innerText = `آخر تحديث للنظام: ${result.last_update}`;
                 container.innerHTML = '';
 
-                result.data.forEach(item => {
+                // التعامل مع مصفوفة البيانات المستلمة
+                const targets = result.data || result;
+
+                targets.forEach(item => {
                     const card = document.createElement('div');
                     card.className = 'card';
+                    const isOnline = item.status.includes('✅');
+                    
                     card.innerHTML = `
-                        <div style="font-size: 1.4rem; font-weight: bold;">${item.name}</div>
-                        <div style="font-size: 0.7rem; color: #888;">${item.type}</div>
-                        <div style="margin: 15px 0; color: ${item.status.includes('✅') ? '#00ff41' : '#ff3131'}">${item.status}</div>
+                        <div style="font-size: 1.6rem; font-weight: bold; color: #fff;">${item.name}</div>
+                        <div style="font-size: 0.8rem; color: #888; margin-bottom: 10px;">${item.type || 'SYSTEM TARGET'}</div>
+                        <div style="color: ${isOnline ? '#00ff41' : '#ff3131'}; font-weight: bold;">${item.status}</div>
                         <div class="latency">الاستجابة: ${item.latency}</div>
                     `;
                     container.appendChild(card);
                 });
             } catch (err) {
-                console.error("خطأ في الاتصال:", err);
+                console.error("Radar Error:", err);
+                document.getElementById('status-container').innerHTML = '<div style="color:red">خطأ في الاتصال بقاعدة البيانات الاستراتيجية.</div>';
             }
         }
+
+        // 2. نظام الممر السري
+        window.addEventListener('keydown', (e) => {
+            // الضغط على حرف V (كبير أو صغير) يفتح البوابة
+            if (e.key.toLowerCase() === 'v') {
+                document.getElementById('vault-overlay').style.display = 'flex';
+                document.getElementById('vault-input').focus();
+            }
+            // الضغط على Esc يغلق البوابة
+            if (e.key === 'Escape') {
+                document.getElementById('vault-overlay').style.display = 'none';
+            }
+        });
+
+        document.getElementById('vault-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                const password = e.target.value;
+                if (password === 'eissaaly07') {
+                    // التوجيه للممر السري (يجب إنشاء ملف vault.html في المستودع)
+                    window.location.href = 'vault.html';
+                } else {
+                    alert('ACCESS DENIED: INCORRECT KEY');
+                    document.getElementById('vault-overlay').style.display = 'none';
+                    e.target.value = '';
+                }
+            }
+        });
+
+        // تشغيل الرادار فور التحميل
         refreshRadar();
-        setInterval(refreshRadar, 60000); // تحديث الواجهة كل دقيقة
+        // تحديث كل 60 ثانية
+        setInterval(refreshRadar, 60000);
     </script>
 </body>
 </html>
