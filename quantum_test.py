@@ -4,9 +4,10 @@ import time
 from datetime import datetime
 
 def check_targets():
+    # الأهداف اللي الرادار هيراقبها
     targets = [
-        {"name": "Google", "url": "https://www.google.com", "type": "Search Engine"},
-        {"name": "GitHub", "url": "https://github.com", "type": "Dev Ops"}
+        {"name": "GitHub", "url": "https://github.com", "type": "System Target"},
+        {"name": "Google", "url": "https://www.google.com", "type": "System Target"}
     ]
     
     results = []
@@ -14,33 +15,32 @@ def check_targets():
         try:
             start_time = time.time()
             response = requests.get(target['url'], timeout=10)
-            end_time = time.time()
-            
-            # حساب السرعة بدقة
-            latency = round(end_time - start_time, 2)
+            latency = round(time.time() - start_time, 2)
             
             results.append({
                 "name": target['name'],
-                "url": target['url'],
                 "type": target['type'],
                 "status": "✅ Online",
-                "latency": f"{latency}s"  # هنا السرعة بتتحسب وتتكتب
+                "latency": f"{latency}s" # دي اللي هتشيل كلمة Calculating وتظهر الرقم
             })
-        except:
+        except Exception as e:
             results.append({
                 "name": target['name'],
+                "type": target['type'],
                 "status": "❌ Offline",
                 "latency": "N/A"
             })
 
-    # الهيكل الجديد اللي الـ HTML بيفهمه
-    final_data = {
+    # هيكل البيانات اللي الـ index.html مستنيه
+    report = {
         "last_update": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "data": results
     }
 
-    with open('data.json', 'w') as f:
-        json.dump(final_data, f, indent=4)
+    with open('data.json', 'w', encoding='utf-8') as f:
+        json.dump(report, f, indent=4, ensure_ascii=False)
+    
+    print("تم تحديث الرادار بنجاح!")
 
 if __name__ == "__main__":
     check_targets()
