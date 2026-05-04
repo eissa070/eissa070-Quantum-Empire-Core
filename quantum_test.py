@@ -1,66 +1,50 @@
 import os
 import requests
-import time
+import json
 from datetime import datetime
 
-# إعدادات الاتصال (Captain Hook)
-WEBHOOK_URL = os.getenv("DISCORD_WEBHOOK")
+# إعدادات الاتصال من خزنة GitHub
+DISCORD_WEBHOOK = os.getenv('DISCORD_WEBHOOK')
 
-# أركان الإمبراطورية (روابطك الحقيقية)
+# أركان الإمبراطورية (روابطك الحقيقية اللي كانت في كودك القديم)
 SITES_TO_MONITOR = {
     "Portfolio & Core": "https://eissa01.netlify.app",
     "Netlify Team Console": "https://app.netlify.com/teams/eissa-s-0mlxtba/projects",
     "GitHub Core Repo": "https://github.com/eissa070/Quantum-Empire-Core"
 }
 
-# أقسام الاستثمار (أضف روابط المنصات اللي هتسجل فيها هنا)
-INVESTMENT_HUBS = {
-    "Email Army (SaaS)": "https://app.netlify.com/projects/eissa01/overview", # لوحة تحكم الإيميلات
-    "Mining Nodes": "رابط_منصة_التعدين",
-    "Affiliate Center": "رابط_منصة_الأفليت",
-    "Free Credit Hub": "رابط_مواقع_الربح_المجاني"
-}
-
-def send_to_discord(title, message, color):
-    payload = {
-        "embeds": [{
-            "title": title,
-            "description": message,
-            "color": color,
-            "timestamp": datetime.utcnow().isoformat(),
-            "footer": {"text": "Empire Management System 🚀"}
-        }]
-    }
-    try:
-        requests.post(WEBHOOK_URL, json=payload)
-    except Exception as e:
-        print(f"Error sending to Discord: {e}")
-
-def run_harvest_cycle():
+def harvest_data():
     print(f"--- {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | Starting Empire Harvest ---")
+    results = []
     
-    # 1. فحص المواقع الأساسية (Netlify & GitHub)
+    # فحص المواقع وتجهيز بيانات الجدول
     for name, url in SITES_TO_MONITOR.items():
         try:
             res = requests.get(url, timeout=15)
-            if res.status_code == 200:
-                send_to_discord(f"✅ Online: {name}", f"الموقع يعمل ومستعد لاستقبال الزوار.\nالرابط: {url}", 3066993)
-            else:
-                send_to_discord(f"⚠️ Warning: {name}", f"كود التنبيه: {res.status_code}", 15105570)
+            status = "Active ✅" if res.status_code == 200 else f"Error {res.status_code} ⚠️"
         except:
-            send_to_discord(f"❌ Offline: {name}", "فشل الاتصال بهذا الركن!", 15158332)
+            status = "Offline ❌"
+        
+        results.append({
+            "node_name": name,
+            "status": status,
+            "timestamp": datetime.now().strftime("%H:%M:%S"),
+            "size": "N/A" # أو أي قيمة تحب تعرضها
+        })
 
-    # 2. تقرير "جيش الإيميلات" و "الأفليت"
-    # هنا هنحط رسالة تأكيدية إن السيستم شغال بيجمع بيانات
-    send_to_discord("💰 تقرير الاستثمار", 
-                   f"• **جيش الإيميلات**: يعمل على تجميع الكريديت المجاني.\n"
-                   f"• **التعدين**: العقد (Nodes) مستقرة.\n"
-                   f"• **الأفليت**: الروابط نشطة وتنتظر التحويلات.", 10181046)
+    # 1. حفظ البيانات في ملف JSON للموقع
+    with open('data.json', 'w') as f:
+        json.dump(results, f, indent=4)
+    print("✅ Data archived to data.json")
+
+    # 2. إرسال التقرير المجمع لديسكورد (بشكل احترافي)
+    if DISCORD_WEBHOOK:
+        report = "🚜 **تقرير حصاد الإمبراطورية الدوري**\n"
+        for r in results:
+            report += f"• {r['node_name']}: {r['status']}\n"
+        
+        requests.post(DISCORD_WEBHOOK, json={"content": report})
+        print("✅ Report sent to Discord")
 
 if __name__ == "__main__":
-    send_to_discord("🚜 انطلاق الإمبراطورية", "تم تشغيل نظام الحصاد الشامل لكل قطاعات العمل.", 15844367)
-    while True:
-        run_harvest_cycle()
-        # فحص كل 30 دقيقة عشان تحافظ على استهلاك البيانات والكريديت
-        print("Waiting for next cycle (30 min)...")
-        time.sleep(1800)
+    harvest_data()

@@ -1,20 +1,37 @@
-name: Empire Auto-Radar
+name: Empire Radar
+
 on:
-  push:
-    branches: [ main ]
   schedule:
-    - cron: '*/30 * * * *'
+    - cron: '*/30 * * * *' # يشتغل كل 30 دقيقة
+  workflow_dispatch: # يسمح لك بتشغيله يدوياً
 
 jobs:
-  run-radar:
+  build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write # مهم جداً عشان يقدر يرفع ملف data.json
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
-          python-version: '3.9'
-      - name: Install dependencies
-        run: pip install requests
-      - name: Start Harvesting
+          python_version: '3.9'
+
+      - name: Install Dependencies
+        run: |
+          pip install requests
+
+      - name: Run Radar Script
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         run: python quantum_test.py
+
+      - name: Commit and Push Changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add data.json
+          git commit -m "Automated Data Update [skip ci]" || echo "No changes to commit"
+          git push
