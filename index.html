@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quantum Empire | Radar HUD</title>
+    <style>
+        :root {
+            --neon-green: #00ff41;
+            --dark-void: #0a0a0a;
+            --glass: rgba(255, 255, 255, 0.05);
+        }
+
+        body {
+            background-color: var(--dark-void);
+            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            color: var(--neon-green);
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            text-shadow: 0 0 10px var(--neon-green);
+            margin-bottom: 30px;
+        }
+
+        #status-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        .card {
+            background: var(--glass);
+            border: 1px solid var(--neon-green);
+            padding: 20px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.2);
+        }
+
+        .name { font-size: 1.5rem; font-weight: bold; margin-bottom: 10px; }
+        .type { color: #aaa; font-size: 0.9rem; margin-bottom: 15px; }
+        .status { font-weight: bold; padding: 5px 10px; border-radius: 5px; }
+        .latency { color: var(--neon-green); font-family: monospace; margin-top: 15px; }
+        
+        .update-time {
+            margin-top: 40px;
+            color: #666;
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Quantum Empire Radar</h1>
+    <div id="status-container">جاري سحب البيانات من القمر الصناعي...</div>
+    <div class="update-time" id="last-update"></div>
+
+    <script>
+        async function updateDashboard() {
+            try {
+                const response = await fetch('./data.json');
+                const result = await response.json();
+                
+                const container = document.getElementById('status-container');
+                const updateElem = document.getElementById('last-update');
+                
+                updateElem.innerText = `آخر تحديث للنظام: ${result.last_update}`;
+                container.innerHTML = '';
+
+                result.data.forEach(target => {
+                    const card = document.createElement('div');
+                    card.className = 'card';
+                    card.innerHTML = `
+                        <div class="name">${target.name}</div>
+                        <div class="type">${target.type}</div>
+                        <div class="status">${target.status}</div>
+                        <div class="latency">الاستجابة: ${target.latency || 'N/A'}</div>
+                    `;
+                    container.appendChild(card);
+                });
+            } catch (error) {
+                console.error("خطأ في جلب البيانات:", error);
+            }
+        }
+
+        // تحديث البيانات كل دقيقة
+        updateDashboard();
+        setInterval(updateDashboard, 60000);
+    </script>
+</body>
+</html>
