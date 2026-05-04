@@ -1,59 +1,46 @@
 import requests
 import json
+import time
 from datetime import datetime
 
-# الأهداف المتطورة (يمكنك إضافة روابط الـ API أو المواقع هنا)
-targets = [
-    {"name": "Google", "url": "https://www.google.com", "type": "Search"},
-    {"name": "GitHub", "url": "https://github.com", "type": "DevOps"},
-    # أضف مواقع الاستثمار أو التعدين الخاصة بك هنا
-]
-
-def harvest_intelligence():
-    results = {
-        "last_update": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-        "empire_status": "Active ⚡",
-        "data": []
-    }
+def check_targets():
+    targets = [
+        {"name": "Google", "url": "https://www.google.com", "type": "Search Engine"},
+        {"name": "GitHub", "url": "https://github.com", "type": "Dev Ops"}
+    ]
     
-    print(f"--- [Starting Intelligence Session: {results['last_update']}] ---")
-    
+    results = []
     for target in targets:
         try:
-            # إضافة headers لمحاكاة متصفح حقيقي لتجنب الحظر
-            headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'}
-            start_time = datetime.now()
-            response = requests.get(target["url"], timeout=15, headers=headers)
-            end_time = datetime.now()
+            start_time = time.time()
+            response = requests.get(target['url'], timeout=10)
+            end_time = time.time()
             
-            # حساب سرعة الاستجابة بالثواني
-            latency = (end_time - start_time).total_seconds()
+            # حساب السرعة بدقة
+            latency = round(end_time - start_time, 2)
             
-            status = "Online ✅" if response.status_code == 200 else f"Slow/Issue ({response.status_code})"
-            
-            results["data"].append({
-                "name": target["name"],
-                "type": target["type"],
-                "status": status,
-                "latency": f"{latency:.2f}s",
-                "health_score": 100 if latency < 1 else 50
+            results.append({
+                "name": target['name'],
+                "url": target['url'],
+                "type": target['type'],
+                "status": "✅ Online",
+                "latency": f"{latency}s"  # هنا السرعة بتتحسب وتتكتب
             })
-            print(f"Successfully harvested: {target['name']} | Latency: {latency:.2f}s")
-            
-        except Exception as e:
-            results["data"].append({
-                "name": target["name"],
-                "type": target["type"],
-                "status": "Target Down ❌",
-                "error": str(e)[:50]
+        except:
+            results.append({
+                "name": target['name'],
+                "status": "❌ Offline",
+                "latency": "N/A"
             })
-            print(f"Critical Failure at: {target['name']}")
 
-    # حفظ البيانات في ملف data.json
-    with open('data.json', 'w', encoding='utf-8') as f:
-        json.dump(results, f, ensure_ascii=False, indent=4)
-    
-    print(f"--- [Session Closed. Intelligence Stored in data.json] ---")
+    # الهيكل الجديد اللي الـ HTML بيفهمه
+    final_data = {
+        "last_update": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "data": results
+    }
+
+    with open('data.json', 'w') as f:
+        json.dump(final_data, f, indent=4)
 
 if __name__ == "__main__":
-    harvest_intelligence()
+    check_targets()
