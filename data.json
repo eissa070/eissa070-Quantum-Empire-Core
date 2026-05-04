@@ -1,14 +1,17 @@
-[
-    {
-        "name": "Google",
-        "url": "https://www.google.com",
-        "status": "Online ✅",
-        "last_check": "2026-05-04 21:58:28"
-    },
-    {
-        "name": "GitHub",
-        "url": "https://github.com",
-        "status": "Online ✅",
-        "last_check": "2026-05-04 21:58:29"
-    }
-]
+{
+    "last_update": "2026-05-04 22:53:08",
+    "data": [
+        {
+            "name": "GitHub",
+            "type": "DevOps Center",
+            "status": "✅ Online",
+            "latency": "0.17s"
+        },
+        {
+            "name": "Google",
+            "type": "Search Engine",
+            "status": "✅ Online",
+            "latency": "0.12s"
+        }
+    ]
+}
