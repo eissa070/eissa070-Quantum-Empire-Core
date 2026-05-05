@@ -1,29 +1,42 @@
 name: 🚀 Eissa Army Deployment
 
 on:
-  repository_dispatch:
-    types: [start_army_mission]
+  workflow_dispatch: # تشغيل يدوي بضغطة زرار
+  schedule:
+    - cron: '*/30 * * * *' # هيفحص كل 30 دقيقة عشان يفضل الجيش مستيقظ
+  push:
+    branches:
+      - main
 
 jobs:
-  deploy:
+  deployment:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
     steps:
-      - name: 📥 Checkout Code
+      - name: 📥 Get Army Code
         uses: actions/checkout@v4
 
-      - name: 🐍 Setup Python
-        uses: actions/experimental/setup-python@v4
+      - name: 🐍 Setup Python Environment
+        uses: actions/setup-python@v4
         with:
           python-version: '3.10'
 
-      - name: ⚙️ Install Dependencies
+      - name: ⚙️ Install Tactical Gear
         run: pip install requests
 
       - name: ⚔️ Execute Mission
         env:
-          # الأسرار التي وضعتها في إعدادات GitHub
-          MY_EMPIRE_TOKEN: ${{ secrets.MY_EMPIRE_TOKEN }}
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-          # البيانات القادمة من واجهة Vault
-          TARGET_URL: ${{ github.event.client_payload.url }}
+          TARGET_URL: ${{ github.event.client_payload.url || 'https://www.google.com' }}
         run: python task_runner.py
+
+      - name: 📑 Archive Mission Logs
+        if: always() # هيسيف التقرير حتى لو المهمة فشلت
+        run: |
+          git config --local user.email "army@eissa.empire"
+          git config --local user.name "Eissa-Army-Bot"
+          git add .
+          git commit -m "📊 Mission Log Updated [Skip CI]" || echo "No logs to sync"
+          git push || echo "Push failed"
