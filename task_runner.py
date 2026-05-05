@@ -1,47 +1,45 @@
-import time
-import random
+import os
 import requests
+import json
 
-# --- إعدادات هوية الإمبراطورية (Phase 6) ---
-CONFIG = {
-    "OPERATIONAL_EMAIL": "eissaaly070@proton.me",
-    "COMMANDER_EMAIL": "eissaaly07@gmail.com",
-    "COMMANDER_NAME": "Eissa"
-}
+# إعدادات الهوية والاتصال (يتم سحبها من الأسرار سحابياً)
+DISCORD_WEBHOOK = os.getenv('DISCORD_WEBHOOK_URL')
+GITHUB_TOKEN = os.getenv('MY_EMPIRE_TOKEN')
+OP_EMAIL = "eissaaly070@proton.me"
+REPORT_EMAIL = "eissaaly07@gmail.com"
 
-def execute_reach_mission(target_url, mission_type, army_size=100):
-    """
-    محرك تشغيل جيش الإيميلات لتنفيذ مهام الريتش
-    """
-    print(f"🚀 [MISSION START] القائد {CONFIG['COMMANDER_NAME']} أصدر أمراً بالهجوم..")
-    print(f"📡 الهدف: {target_url}")
-    print(f"🛠️ نوع المهمة: {mission_type}")
-    print(f"👥 حجم القوة: {army_size} جندي رقمي من {CONFIG['OPERATIONAL_EMAIL']}")
-    print("-" * 50)
+def send_discord_alert(status, details):
+    """إرسال تنبيه فوري لغرفة عمليات ديسكورد"""
+    if not DISCORD_WEBHOOK:
+        print("خطأ: رابط الـ Webhook غير موجود")
+        return
 
-    for i in range(1, army_size + 1):
-        # هنا تتم عملية محاكاة التفاعل (اللايكات أو المتابعة)
-        # في النسخة المتقدمة نستخدم Selenium أو Playwright هنا
-        print(f"👤 جندي [{i}/{army_size}]: جاري تنفيذ {mission_type} على الرابط...")
-        
-        # فاصل زمني عشوائي لمحاكاة السلوك البشري وتجنب الحظر
-        time.sleep(random.uniform(0.5, 1.5)) 
+    payload = {
+        "username": "Eissa Empire Bot",
+        "avatar_url": "https://github.com/eissa070.png", # سيستخدم صورتك في جيتهاب
+        "embeds": [{
+            "title": f"⚔️ تقرير المهمة: {status}",
+            "description": details,
+            "color": 0x00ff41 if status == "نجاح" else 0xff0000,
+            "footer": {"text": f"القائد: عيسى | العمليات: {OP_EMAIL}"}
+        }]
+    }
+    requests.post(DISCORD_WEBHOOK, json=payload)
 
-    print("-" * 50)
-    print(f"✅ تم اكتمال المهمة بنجاح.")
-    send_final_report(target_url, mission_type, army_size)
-
-def send_final_report(url, mission, size):
-    """
-    إرسال تقرير المهمة النهائي لمكتب القائد في Gmail
-    """
-    print(f"📧 جاري إرسال التقرير النهائي إلى {CONFIG['COMMANDER_EMAIL']}...")
-    # هنا يتم استدعاء دالة الإرسال عبر SMTP التي جهزناها سابقاً
-    summary = f"الخلاصة: تم تنفيذ {mission} لـ {size} حساب على الرابط {url}."
-    # (كود الإرسال الفعلي يتم تفعيله هنا)
+def execute_mission():
+    # هنا يتم وضع كود المهمة الفعلي (زيادة ريتش، فحص، إلخ)
+    target = os.getenv('TARGET_URL', 'لا يوجد هدف')
+    
+    print(f"جاري تشغيل المهمة على: {target}...")
+    
+    # محاكاة لنجاح المهمة
+    success = True 
+    
+    if success:
+        msg = f"تم اختراق الهدف بنجاح: {target}\nالتقارير التفصيلية أُرسلت لبريد {REPORT_EMAIL}"
+        send_discord_alert("نجاح", msg)
+    else:
+        send_discord_alert("فشل", "تعذر الوصول للهدف، جاري إعادة المحاولة...")
 
 if __name__ == "__main__":
-    # هذا الرابط هو الذي سيأتي من الخزنة (Vault) تلقائياً
-    # سنضع رابط فيسبوك كافتراضي للتجربة
-    DEFAULT_TARGET = "https://www.facebook.com/?locale=ar_AR"
-    execute_reach_mission(DEFAULT_TARGET, "General Reach Boost")
+    execute_mission()

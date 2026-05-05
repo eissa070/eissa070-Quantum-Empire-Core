@@ -17,22 +17,13 @@ jobs:
           python-version: '3.10'
 
       - name: ⚙️ Install Dependencies
-        run: |
-          pip install requests
-          # يمكنك إضافة أي مكتبات يحتاجها الجيش هنا
+        run: pip install requests
 
       - name: ⚔️ Execute Mission
         env:
-          # الربط بالسر الذي أنشأته في الإعدادات
-          GITHUB_TOKEN: ${{ secrets.MY_EMPIRE_TOKEN }} 
-          # استقبال الرابط من واجهة Vault
+          # الأسرار التي وضعتها في إعدادات GitHub
+          MY_EMPIRE_TOKEN: ${{ secrets.MY_EMPIRE_TOKEN }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          # البيانات القادمة من واجهة Vault
           TARGET_URL: ${{ github.event.client_payload.url }}
-          # استقبال نوع المهمة
-          MISSION_TYPE: ${{ github.event.client_payload.mission }}
-          # بريد العمليات الرقمية
-          OP_EMAIL: "eissaaly070@proton.me"
-          # بريد القيادة لاستلام التقارير
-          REPORT_EMAIL: "eissaaly07@gmail.com"
-          COMMANDER: "Eissa"
-        run: |
-          python task_runner.py
+        run: python task_runner.py
