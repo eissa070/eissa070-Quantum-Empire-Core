@@ -1,42 +1,42 @@
-name: 🚀 Eissa Army Deployment
+name: Eissa Army Deployment
 
 on:
-  workflow_dispatch: # تشغيل يدوي بضغطة زرار
+  workflow_dispatch:
   schedule:
-    - cron: '*/30 * * * *' # هيفحص كل 30 دقيقة عشان يفضل الجيش مستيقظ
+    - cron: '*/30 * * * *'
   push:
     branches:
       - main
 
 jobs:
-  deployment:
+  mission-task:
     runs-on: ubuntu-latest
     permissions:
       contents: write
     
     steps:
-      - name: 📥 Get Army Code
+      - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: 🐍 Setup Python Environment
+      - name: Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
 
-      - name: ⚙️ Install Tactical Gear
+      - name: Install Dependencies
         run: pip install requests
 
-      - name: ⚔️ Execute Mission
+      - name: Run Task
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-          TARGET_URL: ${{ github.event.client_payload.url || 'https://www.google.com' }}
+          TARGET_URL: 'https://www.google.com'
         run: python task_runner.py
 
-      - name: 📑 Archive Mission Logs
-        if: always() # هيسيف التقرير حتى لو المهمة فشلت
+      - name: Sync Logs
+        if: always()
         run: |
-          git config --local user.email "army@eissa.empire"
-          git config --local user.name "Eissa-Army-Bot"
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
           git add .
-          git commit -m "📊 Mission Log Updated [Skip CI]" || echo "No logs to sync"
-          git push || echo "Push failed"
+          git commit -m "📊 auto-sync logs [skip ci]" || echo "No changes"
+          git push || echo "Push skipped"
