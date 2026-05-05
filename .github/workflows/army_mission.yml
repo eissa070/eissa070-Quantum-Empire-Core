@@ -1,0 +1,38 @@
+name: 🚀 Eissa Army Deployment
+
+on:
+  repository_dispatch:
+    types: [start_army_mission]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+
+      - name: 🐍 Setup Python
+        uses: actions/experimental/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: ⚙️ Install Dependencies
+        run: |
+          pip install requests
+          # يمكنك إضافة أي مكتبات يحتاجها الجيش هنا
+
+      - name: ⚔️ Execute Mission
+        env:
+          # الربط بالسر الذي أنشأته في الإعدادات
+          GITHUB_TOKEN: ${{ secrets.MY_EMPIRE_TOKEN }} 
+          # استقبال الرابط من واجهة Vault
+          TARGET_URL: ${{ github.event.client_payload.url }}
+          # استقبال نوع المهمة
+          MISSION_TYPE: ${{ github.event.client_payload.mission }}
+          # بريد العمليات الرقمية
+          OP_EMAIL: "eissaaly070@proton.me"
+          # بريد القيادة لاستلام التقارير
+          REPORT_EMAIL: "eissaaly07@gmail.com"
+          COMMANDER: "Eissa"
+        run: |
+          python task_runner.py
