@@ -2,65 +2,86 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quantum Vault | Eissa Edition</title>
+    <title>Quantum Vault | Eissa Command Center</title>
     <style>
-        :root { --gold: #ffcc00; --bg: #050505; --neon: #00ff41; }
-        body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; }
-        .crypto-ticker { background: #111; padding: 10px; display: flex; gap: 20px; border-bottom: 1px solid #222; font-family: monospace; font-size: 0.9rem; justify-content: center; }
+        :root { --gold: #ffcc00; --bg: #050505; --neon: #00ff41; --army-blue: #00d4ff; }
+        body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; overflow-x: hidden; }
         .header { border-bottom: 2px solid var(--gold); padding: 15px; display: flex; justify-content: space-between; align-items: center; background: rgba(255,204,0,0.05); }
-        .main-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; padding: 20px; }
-        .card { background: #0f0f0f; border: 1px solid #222; padding: 20px; border-radius: 12px; position: relative; }
-        .card:hover { border-color: var(--gold); }
-        .balance { font-size: 2rem; font-weight: bold; color: var(--gold); margin: 10px 0; }
-        .btn-action { background: transparent; border: 1px solid var(--gold); color: var(--gold); padding: 8px; border-radius: 5px; cursor: pointer; width: 100%; margin-top: 10px; transition: 0.3s; }
-        .btn-action:hover { background: var(--gold); color: black; }
-        .up { color: var(--neon); }
+        .main-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; padding: 20px; }
+        .card { background: #0f0f0f; border: 1px solid #222; padding: 20px; border-radius: 12px; transition: 0.3s; }
+        .card:hover { border-color: var(--gold); transform: translateY(-5px); }
+        .army-status { color: var(--army-blue); font-family: monospace; font-size: 1.2rem; }
+        input, select { background: #000; border: 1px solid #333; color: white; padding: 10px; width: 90%; margin: 10px 0; border-radius: 5px; }
+        .btn-deploy { background: var(--army-blue); color: black; border: none; padding: 12px; width: 100%; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        .btn-report { background: transparent; border: 1px solid var(--gold); color: var(--gold); padding: 10px; width: 100%; margin-top: 10px; cursor: pointer; }
+        .badge { background: var(--neon); color: black; padding: 2px 8px; border-radius: 10px; font-size: 0.7rem; float: left; }
     </style>
 </head>
 <body>
-    <div class="crypto-ticker" id="crypto-ticker">
-        <div>BTC: <span id="btc-price">Loading...</span></div>
-        <div>ETH: <span id="eth-price">Loading...</span></div>
-        <div>BNB: <span id="bnb-price">Loading...</span></div>
-        <div>USDT: <span class="up">1.00$</span></div>
-    </div>
+
     <div class="header">
-        <h1 style="color: var(--gold); margin: 0;">🔱 مركز العمليات والتمويل</h1>
-        <span style="color: var(--neon);">● Admin: Eissa</span>
+        <div>
+            <h1 style="color: var(--gold); margin: 0;">🔱 إمبراطورية عيسى | المرحلة 6</h1>
+            <small style="color: #666;">مركز قيادة العمليات والريتش العالمي</small>
+        </div>
+        <div style="text-align: left;">
+            <div class="army-status">STATUS: ONLINE</div>
+            <small>Base: eissaaly070@proton.me</small>
+        </div>
     </div>
+
     <div class="main-grid">
-        <div class="card">
-            <h3>محفظة العملات الرقمية</h3>
-            <div style="font-family: monospace; font-size: 0.8rem; background: #000; padding: 10px; margin: 10px 0;">Wallet: 0x71C...Eissa070</div>
-            <button class="btn-action">سحب الأرباح عبر PayPal</button>
+        <!-- قسم جيش الإيميلات والريتش -->
+        <div class="card" style="border-color: var(--army-blue);">
+            <span class="badge">Active Army</span>
+            <h3>🚀 محرك الريتش العالمي</h3>
+            <p>تحكم في جيش الحسابات لرفع التفاعل:</p>
+            <input type="text" id="target-link" placeholder="أدخل رابط (FB, IG, TikTok, X)">
+            <select id="service-type">
+                <option>زيادة متابعين (Followers)</option>
+                <option>إعجابات تلقائية (Likes)</option>
+                <option>مشاركات (Shares)</option>
+                <option>مشاهدات فيديو (Views)</option>
+            </select>
+            <button class="btn-deploy" onclick="deployArmy()">إرسال الجيش للمهمة ⚔️</button>
+            <button class="btn-report" onclick="sendGmailReport()">إرسال الخلاصة إلى Gmail 📧</button>
         </div>
+
+        <!-- قسم التمويل والكريديت -->
         <div class="card">
-            <h3>📦 برنامج المبيعات الشامل</h3>
-            <div style="margin: 15px 0;">
-                <div>مبيعات اليوم: <span class="up">+450$</span></div>
-                <div>المخزون: مستقر ✅</div>
+            <h3>💰 الخزنة المالية (Vault)</h3>
+            <div style="font-size: 1.5rem; color: var(--gold);">Balance: $1,250.00</div>
+            <p style="font-size: 0.8rem; color: #888;">تشمل أرصدة Azure و PayPal المكتشفة.</p>
+            <hr style="border: 0.5px solid #222;">
+            <div id="crypto-mini-radar">
+                BTC: <span style="color: var(--neon);">$64,230</span> | ETH: <span style="color: var(--neon);">$3,450</span>
             </div>
-            <button class="btn-action">فتح لوحة التحكم</button>
         </div>
+
+        <!-- قسم برنامج المبيعات -->
         <div class="card">
-            <h3>الرصيد والكريديت المجاني</h3>
-            <div class="balance">150.00$</div>
-            <p style="font-size: 0.8rem; color: #666;">رصيد مجمع من GitHub & Google Cloud</p>
-            <button class="btn-action">تحديث الأرصدة</button>
+            <h3>📦 نظام المبيعات الشامل</h3>
+            <div style="margin: 10px 0;">
+                <div>الطلبات الجارية: <span style="color: var(--neon);">12</span></div>
+                <div>المنصة الاستشارية: <span style="color: var(--army-blue);">نشطة</span></div>
+            </div>
+            <button class="btn-report" style="border-color: #444; color: #888;">فتح لوحة الإدارة</button>
         </div>
     </div>
+
     <script>
-        async function getPrices() {
-            try {
-                const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,binancecoin&vs_currencies=usd');
-                const data = await res.json();
-                document.getElementById('btc-price').innerText = data.bitcoin.usd.toLocaleString() + '$';
-                document.getElementById('eth-price').innerText = data.ethereum.usd.toLocaleString() + '$';
-                document.getElementById('bnb-price').innerText = data.binancecoin.usd.toLocaleString() + '$';
-            } catch (err) { console.log("Update Failed"); }
+        function deployArmy() {
+            const link = document.getElementById('target-link').value;
+            if(link) {
+                alert("جاري تحريك الجيش إلى: " + link + "\nسيتم تنفيذ المهمة عبر eissaaly070@proton.me");
+            } else {
+                alert("يرجى إدخال الرابط أولاً يا عيسى.");
+            }
         }
-        getPrices(); setInterval(getPrices, 30000);
+
+        function sendGmailReport() {
+            alert("جاري تجهيز الخلاصة وإرسالها إلى eissaaly07@gmail.com...");
+        }
     </script>
 </body>
 </html>
