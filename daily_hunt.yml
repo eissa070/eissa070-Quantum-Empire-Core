@@ -1,0 +1,13 @@
+name: Daily Crypto & Credit Hunt
+on:
+  schedule:
+    - cron: '0 0 * * *' # يعمل كل يوم في منتصف الليل
+  workflow_dispatch: # يسمح لك بتشغيله يدوياً
+
+jobs:
+  hunt:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Run Hunter Bot
+        run: python hunter_bot.py
