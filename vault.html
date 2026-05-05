@@ -3,126 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مركز قيادة عيسى | Eissa Command Center</title>
+    <title>خزنة عيسى | Eissa Vault</title>
     <style>
-        :root {
-            --primary-glow: #00ff41;
-            --bg-dark: #0a0a0a;
-            --card-bg: #161616;
-        }
-
-        body {
-            background-color: var(--bg-dark);
-            color: white;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 500px; /* مثالي للموبايل */
-            background: var(--card-bg);
-            padding: 25px;
-            border-radius: 15px;
-            border: 1px solid var(--primary-glow);
-            box-shadow: 0 0 20px rgba(0, 255, 65, 0.2);
-        }
-
-        h2 {
-            color: var(--primary-glow);
-            text-align: center;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            font-size: 1.5rem;
-        }
-
-        .status-bar {
-            font-size: 0.8rem;
-            text-align: center;
-            margin-bottom: 20px;
-            color: #888;
-        }
-
-        input, select {
-            width: 100%;
-            padding: 15px;
-            margin: 10px 0;
-            background: #222;
-            border: 1px solid #444;
-            color: white;
-            border-radius: 8px;
-            box-sizing: border-box; /* لضمان عدم خروج الإدخال عن الإطار */
-        }
-
-        button {
-            width: 100%;
-            padding: 18px;
-            background: var(--primary-glow);
-            color: black;
-            border: none;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-            font-size: 1.1rem;
-            transition: 0.3s;
-            margin-top: 15px;
-        }
-
-        button:active {
-            transform: scale(0.98);
-            background: #00cc33;
-        }
-
-        .footer-note {
-            margin-top: 20px;
-            font-size: 0.7rem;
-            color: #555;
-            text-align: center;
-        }
+        body { background: #0a0a0a; color: #00ff41; font-family: sans-serif; text-align: center; padding: 20px; }
+        .box { border: 1px solid #00ff41; padding: 20px; border-radius: 15px; max-width: 400px; margin: auto; }
+        input, button { width: 100%; padding: 15px; margin: 10px 0; border-radius: 8px; border: none; font-weight: bold; }
+        input { background: #1a1a1a; color: white; }
+        button { background: #00ff41; color: black; cursor: pointer; }
     </style>
 </head>
 <body>
-
-    <div class="container">
-        <h2>Eissa Command Center</h2>
-        <div class="status-bar">الحالة: متصل بالسحابة 🛰️</div>
-
-        <label>رابط الهدف (Target URL):</label>
-        <input type="url" id="targetUrl" placeholder="https://facebook.com/..." required>
-
-        <label>نوع المهمة:</label>
-        <select id="missionType">
-            <option value="Reach Boost">زيادة الريتش (Reach Boost)</option>
-            <option value="Daily Hunt">رادار الصيد (Daily Hunt)</option>
-            <option value="Security Check">فحص أمني (Security Check)</option>
-        </select>
-
-        <button onclick="launchMission()">إرسال الجيش للمهمة ⚔️</button>
-        
-        <div class="footer-note">
-            مرتبط بـ eissaaly070@proton.me | التقارير ترسل لـ Gmail
-        </div>
+    <div class="box">
+        <h2>مركز قيادة عيسى ⚔️</h2>
+        <input type="url" id="target" placeholder="ضع رابط الهدف هنا">
+        <button onclick="launch()">إطلاق الجيش</button>
     </div>
-
     <script>
-        async function launchMission() {
-            const url = document.getElementById('targetUrl').value;
-            const mission = document.getElementById('missionType').value;
+        async function launch() {
+            const url = document.getElementById('target').value;
+            // استبدل الروابط ببيانات مستودعك الحقيقية
+            const user = "eissa070"; 
+            const repo = "eissa070-Quantum-Empire-Core";
+            const token = "YOUR_GITHUB_TOKEN"; // يفضل استخدام API وسيط للأمان
 
-            if(!url) {
-                alert("برجاء إدخال رابط الهدف يا قائد!");
-                return;
-            }
-
-            // ملاحظة للقائد عيسى: التوكين يتم سحبه الآن من GitHub Secrets سحابياً
-            // هذا الزر يرسل الإشارة فقط (Repository Dispatch)
-            alert("جاري إرسال الأوامر للسحابة.. تابع التقرير على Gmail");
-            
-            // هنا نضع كود الـ API الخاص بـ GitHub كما فعلنا سابقاً
+            alert("جاري إرسال الإشارة للسحابة...");
+            await fetch(`https://api.github.com/repos/${user}/${repo}/dispatches`, {
+                method: 'POST',
+                headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github.v3+json' },
+                body: JSON.stringify({ event_type: "start_mission", client_payload: { url: url } })
+            });
         }
     </script>
 </body>

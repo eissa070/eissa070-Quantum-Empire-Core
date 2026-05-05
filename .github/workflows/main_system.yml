@@ -1,0 +1,37 @@
+name: 🛡️ Eissa Empire System
+on:
+  repository_dispatch:
+    types: [start_mission]
+  schedule:
+    - cron: '0 */6 * * *' # يعمل كل 6 ساعات تلقائياً
+
+jobs:
+  execute:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: ⚙️ Install
+        run: pip install requests
+
+      - name: ⚔️ Run
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          TARGET_URL: ${{ github.event.client_payload.url }}
+        run: python task_runner.py
+
+      - name: 💾 Sync Data
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "Eissa-Bot"
+          git add blacklist.txt fail_counts.json || echo ""
+          git commit -m "🤖 تحديث القائمة السوداء [Skip CI]" || echo ""
+          git push || echo ""
